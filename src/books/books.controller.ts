@@ -57,4 +57,19 @@ export class BooksController {
     await this.booksService.deleteById(id);
     return { success: true };
   }
+
+  @Post('/like')
+  @UseGuards(JwtAuthGuard)
+  async like(
+    @Body('bookId', new ParseUUIDPipe()) bookId: string,
+    @Body('userId', new ParseUUIDPipe()) userId: string,
+  ) {
+    if (
+      !(await this.booksService.getById(bookId)) &&
+      !(await this.booksService.getById(userId))
+    )
+      throw new NotFoundException('Book or User not found');
+    await this.booksService.like(bookId, userId);
+    return { success: true };
+  }
 }
